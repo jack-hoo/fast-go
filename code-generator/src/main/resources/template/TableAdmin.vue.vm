@@ -1,0 +1,224 @@
+<template>
+    <Card class="card-head-black">
+        <p slot="title">
+            <Icon type="android-checkbox-outline"></Icon>
+            ${comments}
+        </p>
+        <div slot="extra" style="margin-top: -5px !important;">
+            <Button type="primary" shape="circle" icon="plus-round"
+                    @click.prevent="show_add_${tableName}_modal"></Button>
+        </div>
+        <div>
+            <Table stripe :columns="${classname}Cols" :data="${classname}List">
+                <p slot="footer" class="page-right">
+                    <Page :total="params.total" :page-size="params.limit" :current="params.currPage"
+                          @on-change="nextPage"></Page>
+                </p>
+            </Table>
+        </div>
+        <Modal
+                v-model="add_${tableName}_modal"
+                title="添加新的${comments}"
+                @on-ok="add_${tableName}"
+                @on-cancel="hide_add_${tableName}_modal">
+            <Row type="flex" justify="center">
+                <Form :model="${classname}" :rules="${classname}Rules" ref="${classname}"
+                      :inline="false" :label-width="80"
+                >
+                    #foreach($column in $columns)
+                        #if($column.columnName != $pk.columnName and $column.columnName != 'op_time' and $column.columnName != 'create_time' and $column.columnName != 'is_valid')
+                            <Form-item label="$column.columnName" prop="$column.attrname">
+                                <Input v-model="${classname}.$column.attrname" placeholder="请填写${classname}.$column.attrname" style="width: 300px"/>
+                            </Form-item>
+                        #end
+
+                    #end
+                </Form>
+            </Row>
+            <Row slot="footer">
+                <Button type="text" @click="hide_add_${tableName}_modal">取消</Button>
+                <Button type="primary" @click="add_${tableName}">确定</Button>
+            </Row>
+        </Modal>
+        <Modal
+                v-model="update_${tableName}_modal"
+                title="更新${comments}"
+                @on-ok="update_${tableName}"
+                @on-cancel="hide_update_${tableName}_modal">
+            <Row type="flex" justify="center">
+                <Form :model="${classname}" :rules="${classname}Rules" ref="update_${tableName}"
+                      :inline="false" :label-width="80"
+                >
+                    #foreach($column in $columns)
+                        #if($column.columnName != $pk.columnName and $column.columnName != 'op_time' and $column.columnName != 'create_time' and $column.columnName != 'is_valid')
+                            <Form-item label="$column.columnName" prop="$column.attrname">
+                                <Input v-model="${classname}.$column.attrname" placeholder="请填写${classname}.$column.attrname" style="width: 300px"/>
+                            </Form-item>
+                        #end
+                    #end
+                </Form>
+            </Row>
+            <Row slot="footer">
+                <Button type="text" @click="hide_update_${tableName}_modal">取消</Button>
+                <Button type="primary" @click="update_${tableName}">确定</Button>
+            </Row>
+        </Modal>
+    </Card>
+</template>
+
+<script>
+    import {
+        add_my_${tableName}, get_${tableName}_list, delete_${tableName}, update_${tableName},
+    } from '../../api/${className}Api';
+
+    export default {
+        name:'${className}',
+        computed: {
+            role: function () {
+                return this.$store.state.user.userInfo.role;
+            }
+        },
+        data(){
+            return{
+            ${classname}:{
+                #foreach($column in $columns)
+                    #if($column.columnName != 'op_time' and $column.columnName != 'create_time' and $column.columnName != 'is_valid')
+                        $column.attrname:null,
+                    #end
+
+                #end
+            },
+                ${classname}Rules:{},
+            add_${tableName}_modal:false,
+
+                    update_${tableName}_modal:false,
+                        ${classname}List:[],
+                        ${classname}Cols:[
+                #foreach($column in $columns)
+                    #if($column.columnName != 'op_time' and $column.columnName != 'create_time' and $column.columnName != 'is_valid')
+                        {
+                            title: '$column.attrname',
+                            key: '$column.attrname',
+                            //width: 100
+                        },
+                    #end
+
+                #end
+                {
+                    title: '操作',
+                    width: 150,
+                    key: 'id',
+                    align: 'center',
+                    render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'info',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                this.show_update_${tableName}_modal(params.index);
+        }
+        }
+        }, '编辑'),
+            h('Button', {
+                props: {
+                    type: 'error',
+                    size: 'small'
+                },
+                style: {
+                    marginRight: '5px'
+                },
+                on: {
+                    click: () => {
+                    this.delete_${tableName}(params.index);
+        }
+        }
+        }, '删除')
+        ]);
+        }
+        }
+        ],
+            params:{
+                limit:15,
+                        page:1,
+                        //order:'order',
+                        sidx:'asc',
+                        totalPage:0,
+                        currPage:0,
+                        total:0}
+        }
+        },
+        methods:{
+            update_${tableName}(){
+                update_${tableName}(this.${classname}).then(res => {
+                        this.hide_update_${tableName}_modal();
+                    this.get_${tableName}_list();
+                }).catch(error => {
+                        console.log(error);
+                });
+
+            },
+            add_${tableName}(){
+                add_my_${tableName}(this.${classname}).then(res => {
+                    this.get_${tableName}_list();
+                this.hide_add_${tableName}_modal();
+            }).catch(error => {
+                    console.log(error);
+            });
+            },
+            hide_add_${tableName}_modal(){
+                this.$refs.${classname}.resetFields();
+                this.add_${tableName}_modal = false
+            },
+            hide_update_${tableName}_modal(){
+                this.$refs.update_${tableName}.resetFields
+                ();
+                this.update_${tableName}_modal = false;
+            },
+            delete_${tableName}(index){
+                let ${pk.columnName}s = [];
+                ${pk.columnName}s.push(this.${classname}List[index].${pk.columnName});
+                delete_${tableName}(${pk.columnName}s).then(res => {
+                    this.get_${tableName}_list();
+                }).catch(error => {
+                        console.log(error);
+                });
+            },
+            show_update_${tableName}_modal(index){
+                this.${classname} = JSON.parse(JSON.stringify(this.${classname}List[index]));
+                this.update_${tableName}_modal = true
+            },
+            show_add_${tableName}_modal(){
+                this.add_${tableName}_modal = true
+            },
+            nextPage(page){
+                this.params.page = page;
+                this.get_${tableName}_list();
+            },
+            get_${tableName}_list(){
+                //如果角色是管理员则调用管理员的接口
+                get_${tableName}_list(this.params).then(res => {
+                    this.${classname}List = res.list;
+                this.params.totalPage = res.totalPage;
+                this.params.currPage = res.currPage;
+                this.params.limit = res.pageSize;
+                this.params.total = res.totalCount;
+                }).catch(error => {
+                        console.log(error);
+                });
+            },
+
+        },
+        mounted(){
+            this.get_${tableName}_list()
+        }
+    }
+</script>
+<style scoped>
+
+</style>

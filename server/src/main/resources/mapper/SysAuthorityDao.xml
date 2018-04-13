@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyingcow.fastgo.server.dao.SysAuthorityDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.flyingcow.fastgo.server.entity.SysAuthorityEntity" id="sysAuthorityMap">
+        <result property="id" column="id"/>
+        <result property="authCode" column="auth_code"/>
+        <result property="authName" column="auth_name"/>
+        <result property="url" column="url"/>
+        <result property="method" column="method"/>
+        <result property="resourceName" column="resource_name"/>
+        <result property="resourceType" column="resource_type"/>
+    </resultMap>
+
+    <!--根据主键查找对象-->
+    <select id="queryObject" resultType="com.flyingcow.fastgo.server.entity.SysAuthorityEntity">
+		select * from `sys_authority` where id = #{value}
+	</select>
+    <!--通过角色id查询对应的权限列表-->
+    <select id="findAuthsByRoleId" resultType="com.flyingcow.fastgo.server.dto.RoleAuthorityDTO">
+        SELECT
+        a.*,b.id as role_auth_id
+        FROM
+        sys_authority  a
+        LEFT JOIN sys_role_auth b ON a.id = b.auth_id
+        WHERE
+        b.role_id = #{VALUE}
+    </select>
+    <!--根据多个字段查找,返回一个对象-->
+
+
+    <!--根据多个字段查找,返回对象列表-->
+    <select id="queryList" resultType="com.flyingcow.fastgo.server.entity.SysAuthorityEntity">
+        select * from `sys_authority`
+        <where>
+            <if test="authCode != null">AND `auth_code` = #{authCode}</if>
+            <if test="authName != null">AND `auth_name` = #{authName}</if>
+            <if test="url != null">AND `url` = #{url}</if>
+            <if test="method != null">AND `method` = #{method}</if>
+            <if test="resourceName != null">AND `resource_name` = #{resourceName}</if>
+            <if test="resourceType != null">AND `resource_type` = #{resourceType}</if>
+            <if test="true">
+                AND is_valid = 1
+            </if>
+        </where>
+        <!--这里添加查询条件:  示例-->
+        <!--<where>
+			<if test="orgId != null">
+				a.org_id = #{orgId}
+			</if>
+			<if test="query != null and query != ''">
+				AND CONCAT(IFNULL(a.host_name,''),IFNULL(a.department,'')) like CONCAT(CONCAT('%', #{query}), '%')
+			</if>
+			<if test="hostName != null and hostName != ''">
+				AND a.host_name LIKE concat (concat('%',#{hostName}),'%')
+			</if>
+		</where>-->
+        <choose>
+            <when test="sidx != null and sidx.trim() != '' and order != null and order.trim() != ''">
+                order by `${order}` ${sidx}
+            </when>
+            <otherwise>
+                order by id ASC
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from `sys_authority`
+        <where>
+            <if test="authCode != null">AND `auth_code` = #{authCode}</if>
+            <if test="authName != null">AND `auth_name` = #{authName}</if>
+            <if test="url != null">AND `url` = #{url}</if>
+            <if test="method != null">AND `method` = #{method}</if>
+            <if test="resourceName != null">AND `resource_name` = #{resourceName}</if>
+            <if test="resourceType != null">AND `resource_type` = #{resourceType}</if>
+            <if test="true">
+                AND is_valid = 1
+            </if>
+        </where>
+        <!--这里添加查询条件:  示例-->
+        <!--<where>
+			<if test="orgId != null">
+				a.org_id = #{orgId}
+			</if>
+			<if test="query != null and query != ''">
+				AND CONCAT(IFNULL(a.host_name,''),IFNULL(a.department,'')) like CONCAT(CONCAT('%', #{query}), '%')
+			</if>
+			<if test="hostName != null and hostName != ''">
+				AND a.host_name LIKE concat (concat('%',#{hostName}),'%')
+			</if>
+		</where>-->
+    </select>
+    <!-- 保存 -->
+    <insert id="save" parameterType="com.flyingcow.fastgo.server.entity.SysAuthorityEntity" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into `sys_authority`
+        <set>
+            <if test="authCode != null">`auth_code` = #{authCode} ,</if>
+            <if test="authName != null">`auth_name` = #{authName} ,</if>
+            <if test="url != null">`url` = #{url} ,</if>
+            <if test="method != null">`method` = #{method} ,</if>
+            <if test="resourceName != null">`resource_name` = #{resourceName} ,</if>
+            <if test="resourceType != null">`resource_type` = #{resourceType} ,</if>
+            is_valid = 1,
+            create_time = now(),
+            op_time = now()
+        </set>
+    </insert>
+
+    <!--批量插入-->
+    <insert id="saveBatch" parameterType="java.util.List" keyProperty="id">
+        INSERT INTO `sys_authority`
+        (
+        `auth_code`,
+        `auth_name`,
+        `url`,
+        `method`,
+        `resource_name`,
+        `resource_type`,
+        is_valid, create_time, op_time
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.authCode},
+            #{item.authName},
+            #{item.url},
+            #{item.method},
+            #{item.resourceName},
+            #{item.resourceType},
+            1, now(), now()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        `auth_code` = `auth_code`,
+        `auth_name` = `auth_name`,
+        `url` = `url`,
+        `method` = `method`,
+        `resource_name` = `resource_name`,
+        `resource_type` = `resource_type`,
+        `is_valid` = 1, `create_time` = now(), `op_time` = now()
+    </insert>
+
+    <update id="update" parameterType="com.flyingcow.fastgo.server.entity.SysAuthorityEntity">
+        update `sys_authority`
+        <set>
+            <if test="authCode != null">`auth_code` = #{authCode},</if>
+            <if test="authName != null">`auth_name` = #{authName},</if>
+            <if test="url != null">`url` = #{url},</if>
+            <if test="method != null">`method` = #{method},</if>
+            <if test="resourceName != null">`resource_name` = #{resourceName},</if>
+            <if test="resourceType != null">`resource_type` = #{resourceType},</if>
+            `op_time` = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--逻辑删除-->
+    <update id="deleteLogically">
+        update `sys_authority`
+        <set>
+            `op_time` = now(),
+            `is_valid` = 0
+        </set>
+        where id = #{id}
+    </update>
+    <!--物理删除 -->
+    <delete id="delete">
+		delete from `sys_authority` where id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        delete from `sys_authority` where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量逻辑删除-->
+    <update id="deleteBatchLogically">
+        update `sys_authority`
+        SET
+        `is_valid` = 0,
+        `op_time` = now()
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--批量删除指定用户资源-->
+    <delete id="deleteOfMine">
+        DELETE FROM `sys_authority` WHERE account_id = #{accountId,jdbcType=INTEGER} AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量逻辑删除用户资源-->
+    <update id="deleteOfMineLogically">
+        update `sys_authority`
+        SET `is_valid` = 0, `op_time` = now()
+        WHERE account_id = #{accountId,jdbcType=INTEGER} AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

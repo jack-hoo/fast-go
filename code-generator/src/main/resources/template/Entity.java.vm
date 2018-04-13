@@ -1,0 +1,34 @@
+package ${package}.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import java.math.BigDecimal;
+
+#if(${hasBigDecimal})
+import java.math.BigDecimal;
+#end
+
+
+/**
+ * ${comments}
+ * 
+ * @author ${author}
+ * @email ${email}
+ * @date ${datetime}
+ */
+@Data
+@Accessors(chain = true)
+public class ${className}Entity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+#foreach ($column in $columns)
+	#if($column.columnName != 'op_time' and $column.columnName != 'create_time' and $column.columnName != 'is_valid')
+        //$column.comments
+        private $column.attrType $column.attrname;
+	#end
+
+#end
+
+}

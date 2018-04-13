@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyingcow.fastgo.server.dao.SysUserDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.flyingcow.fastgo.server.entity.SysUserEntity" id="sysUserMap">
+        <result property="id" column="id"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="username" column="username"/>
+        <result property="sex" column="sex"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="qq" column="qq"/>
+        <result property="wechatId" column="wechat_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="status" column="status"/>
+    </resultMap>
+    <!--根据账号查询用户信息-->
+    <select id="queryByAccount" resultType="com.flyingcow.fastgo.server.entity.SysUserEntity">
+        SELECT * FROM sys_user WHERE account = #{VALUE}
+    </select>
+    <!--根据主键查找对象-->
+    <select id="queryObject" resultType="com.flyingcow.fastgo.server.entity.SysUserEntity">
+        SELECT *
+        FROM `sys_user`
+        WHERE id = #{value}
+    </select>
+    <!--根据多个字段查找,返回一个对象-->
+
+
+    <!--根据多个字段查找,返回对象列表-->
+    <select id="queryList" resultType="com.flyingcow.fastgo.server.entity.SysUserEntity">
+        select * from `sys_user`
+        <where>
+            <if test="account != null">AND `account` = #{account}</if>
+            <if test="password != null">AND `password` = #{password}</if>
+            <if test="username != null">AND `username` = #{username}</if>
+            <if test="sex != null">AND `sex` = #{sex}</if>
+            <if test="email != null">AND `email` = #{email}</if>
+            <if test="phone != null">AND `phone` = #{phone}</if>
+            <if test="qq != null">AND `qq` = #{qq}</if>
+            <if test="wechatId != null">AND `wechat_id` = #{wechatId}</if>
+            <if test="roleId != null">AND `role_id` = #{roleId}</if>
+            <if test="status != null">AND `status` = #{status}</if>
+            <if test="true">
+                AND is_valid = 1
+            </if>
+        </where>
+        <!--这里添加查询条件:  示例-->
+        <!--<where>
+			<if test="orgId != null">
+				a.org_id = #{orgId}
+			</if>
+			<if test="query != null and query != ''">
+				AND CONCAT(IFNULL(a.host_name,''),IFNULL(a.department,'')) like CONCAT(CONCAT('%', #{query}), '%')
+			</if>
+			<if test="hostName != null and hostName != ''">
+				AND a.host_name LIKE concat (concat('%',#{hostName}),'%')
+			</if>
+		</where>-->
+        <choose>
+            <when test="sidx != null and sidx.trim() != '' and order != null and order.trim() != ''">
+                order by `${order}` ${sidx}
+            </when>
+            <otherwise>
+                order by id ASC
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from `sys_user`
+        <where>
+            <if test="account != null">AND `account` = #{account}</if>
+            <if test="password != null">AND `password` = #{password}</if>
+            <if test="username != null">AND `username` = #{username}</if>
+            <if test="sex != null">AND `sex` = #{sex}</if>
+            <if test="email != null">AND `email` = #{email}</if>
+            <if test="phone != null">AND `phone` = #{phone}</if>
+            <if test="qq != null">AND `qq` = #{qq}</if>
+            <if test="wechatId != null">AND `wechat_id` = #{wechatId}</if>
+            <if test="roleId != null">AND `role_id` = #{roleId}</if>
+            <if test="status != null">AND `status` = #{status}</if>
+            <if test="true">
+                AND is_valid = 1
+            </if>
+        </where>
+        <!--这里添加查询条件:  示例-->
+        <!--<where>
+			<if test="orgId != null">
+				a.org_id = #{orgId}
+			</if>
+			<if test="query != null and query != ''">
+				AND CONCAT(IFNULL(a.host_name,''),IFNULL(a.department,'')) like CONCAT(CONCAT('%', #{query}), '%')
+			</if>
+			<if test="hostName != null and hostName != ''">
+				AND a.host_name LIKE concat (concat('%',#{hostName}),'%')
+			</if>
+		</where>-->
+    </select>
+    <!-- 保存 -->
+    <insert id="save" parameterType="com.flyingcow.fastgo.server.entity.SysUserEntity" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into `sys_user`
+        <set>
+            <if test="account != null">`account` = #{account} ,</if>
+            <if test="password != null">`password` = #{password} ,</if>
+            <if test="username != null">`username` = #{username} ,</if>
+            <if test="sex != null">`sex` = #{sex} ,</if>
+            <if test="email != null">`email` = #{email} ,</if>
+            <if test="phone != null">`phone` = #{phone} ,</if>
+            <if test="qq != null">`qq` = #{qq} ,</if>
+            <if test="wechatId != null">`wechat_id` = #{wechatId} ,</if>
+            <if test="roleId != null">`role_id` = #{roleId} ,</if>
+            <if test="status != null">`status` = #{status} ,</if>
+            is_valid = 1,
+            create_time = now(),
+            op_time = now()
+        </set>
+    </insert>
+
+    <!--批量插入-->
+    <insert id="saveBatch" parameterType="java.util.List" keyProperty="id">
+        INSERT INTO `sys_user`
+        (
+        `account`,
+        `password`,
+        `username`,
+        `sex`,
+        `email`,
+        `phone`,
+        `qq`,
+        `wechat_id`,
+        `role_id`,
+        `status`,
+        is_valid, create_time, op_time
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.account},
+            #{item.password},
+            #{item.username},
+            #{item.sex},
+            #{item.email},
+            #{item.phone},
+            #{item.qq},
+            #{item.wechatId},
+            #{item.roleId},
+            #{item.status},
+            1, now(), now()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        `account` = `account`,
+        `password` = `password`,
+        `username` = `username`,
+        `sex` = `sex`,
+        `email` = `email`,
+        `phone` = `phone`,
+        `qq` = `qq`,
+        `wechat_id` = `wechat_id`,
+        `role_id` = `role_id`,
+        `status` = `status`,
+        `is_valid` = 1, `create_time` = now(), `op_time` = now()
+    </insert>
+
+    <update id="update" parameterType="com.flyingcow.fastgo.server.entity.SysUserEntity">
+        update `sys_user`
+        <set>
+            <if test="account != null">`account` = #{account},</if>
+            <if test="password != null">`password` = #{password},</if>
+            <if test="username != null">`username` = #{username},</if>
+            <if test="sex != null">`sex` = #{sex},</if>
+            <if test="email != null">`email` = #{email},</if>
+            <if test="phone != null">`phone` = #{phone},</if>
+            <if test="qq != null">`qq` = #{qq},</if>
+            <if test="wechatId != null">`wechat_id` = #{wechatId},</if>
+            <if test="roleId != null">`role_id` = #{roleId},</if>
+            <if test="status != null">`status` = #{status},</if>
+            `op_time` = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--逻辑删除-->
+    <update id="deleteLogically">
+        update `sys_user`
+        <set>
+            `op_time` = now(),
+            `is_valid` = 0
+        </set>
+        where id = #{id}
+    </update>
+    <!--物理删除 -->
+    <delete id="delete">
+        DELETE FROM `sys_user`
+        WHERE id = #{value}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from `sys_user` where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量逻辑删除-->
+    <update id="deleteBatchLogically">
+        update `sys_user`
+        SET
+        `is_valid` = 0,
+        `op_time` = now()
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--批量删除指定用户资源-->
+    <delete id="deleteOfMine">
+        DELETE FROM `sys_user` WHERE account_id = #{accountId,jdbcType=INTEGER} AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--批量逻辑删除用户资源-->
+    <update id="deleteOfMineLogically">
+        update `sys_user`
+        SET `is_valid` = 0, `op_time` = now()
+        WHERE account_id = #{accountId,jdbcType=INTEGER} AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

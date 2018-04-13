@@ -1,0 +1,33 @@
+
+server:
+  port: 8080
+  tomcat:
+    max-threads: 1000
+    uri-encoding: utf-8
+    min-spare-threads: 30
+  connection-timeout: 10s
+
+spring:
+  profiles:
+    active: dev
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  config-location: classpath:mybatis.xml
+
+#jwt配置
+jwt:
+  header: Authorization
+  secret: JieLinFast
+#  一个星期过期时间
+#  expiration: 604800
+#  24小时过期
+  expiration: 86400
+  tokenHead: "Bearer "
+  route:
+    authentication:
+      path: auth
+      refresh: refresh
+      register: "auth/register"
+
+
+

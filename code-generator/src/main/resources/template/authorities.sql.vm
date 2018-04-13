@@ -1,0 +1,34 @@
+-- 插入基础权限
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+    VALUES ('${tableName}_list', '查看${comments}列表', '/${tableName}', 'get', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+    VALUES ('${tableName}_add', '保存${comments}', '/${tableName}', 'post', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+VALUES ('${tableName}_update', '更新${comments}', '/${tableName}', 'put', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+    VALUES ('${tableName}_delete', '删除${comments}', '/${tableName}', 'delete', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+    VALUES ('${tableName}_info', '查看一个${comments}信息', '/${tableName}', 'delete', '${tableName}', '接口');
+
+-- 插入用户资源私有权限
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+VALUES ('my_${tableName}', '查看我的${comments}信息', '/${tableName}/me', 'get', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+    VALUES ('my_${tableName}_list', '查看${comments}列表', '/${tableName}/me', 'get', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+VALUES ('save_my_${tableName}', '保存我的${comments}', '/${tableName}/me', 'post', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+VALUES ('update_my_${tableName}', '更新我的${comments}', '/${tableName}/me', 'put', '${tableName}', '接口');
+
+INSERT INTO `sys_authority` (`auth_code`, `auth_name`, `url`, `method`, `resource_name`, `resource_type`)
+VALUES ('delete_my_${tableName}', '删除我的${comments}', '/${tableName}/me', 'delete', '${tableName}', '接口');
+
+

@@ -1,0 +1,106 @@
+import fetch from '../libs/fetch';
+//系统权限级别接口
+/**
+ * 添加${classname},供后台使用
+ */
+export function add_${tableName} (${classname}) {
+    return fetch({
+        url: '/${tableName}',
+        method: 'post',
+        data: ${classname}
+    })
+}
+/**
+ * 查询所有${classname}纪录,供后台使用
+ */
+export function get_${tableName}_list(params){
+	return fetch({
+		url: '/${tableName}',
+		method: 'get',
+		params: params
+	})
+}
+/**
+ * 查询${classname}供后台使用
+ */
+export function get_${tableName} (id) {
+    return fetch({
+        url: '/${tableName}/'+id,
+        method: 'get',
+    })
+}
+
+/**
+ * 修改${classname},供后台使用
+ */
+export function update_${tableName}(${classname}) {
+	return fetch({
+		url: '/${tableName}',
+		method: 'put',
+		data: ${classname}
+	})
+}
+/**
+ * 删除某个${classname}资源,供后台使用
+ */
+export function delete_${tableName}(ids) {
+	return fetch({
+		url: '/${tableName}',
+		method: 'delete',
+		data: ids
+	})
+}
+
+//用户级别接口
+
+/**
+ * 用户添加${classname}
+ */
+
+export function add_my_${tableName} (${classname}) {
+    return fetch({
+        url: '/${tableName}/me',
+        method: 'post',
+        data: ${classname}
+    })
+}
+/**
+ * 查询用户所有${classname}纪录
+ */
+export function get_my_${tableName}_list(params){
+    return fetch({
+        url: '/${tableName}/me',
+        method: 'get',
+        params: params
+    })
+}
+/**
+ * 查询用户${classname}
+ */
+export function get_my_${tableName} (id) {
+    return fetch({
+        url: '/${tableName}/me/'+id,
+        method: 'get',
+    })
+}
+
+/**
+ * 用户修改${classname}
+ */
+export function update_my_${tableName}(${classname}) {
+    return fetch({
+        url: '/${tableName}/me',
+        method: 'put',
+        data: ${classname}
+    })
+}
+/**
+ * 用户删除某个${classname}资源
+ */
+export function delete_my_${tableName}(ids) {
+    return fetch({
+        url: '/${tableName}/me',
+        method: 'delete',
+        data: ids
+    })
+}

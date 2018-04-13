@@ -1,0 +1,119 @@
+package ${package}.controller;
+
+import java.util.List;
+import java.util.Map;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
+
+import ${package}.entity.${className}Entity;
+import ${package}.service.${className}Service;
+import ${package}.common.utils.PageUtils;
+import ${package}.common.utils.Query;
+import ${package}.common.utils.Result;
+import ${package}.common.anotation.CurrentUser;
+import ${package}.entity.SysUserEntity;
+import ${package}.service.SysUserService;
+import ${package}.common.utils.ResultUtil;
+
+
+/**
+ * ${comments}
+ * 
+ * @author ${author}
+ * @email ${email}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("${tableName}")
+public class My${className}Controller {
+	@Autowired
+	private ${className}Service ${classname}Service;
+
+	/**
+	 * 查询用户的所有资源
+	 */
+	@GetMapping("/me")
+    @PreAuthorize("hasAuthority('my_${tableName}_list')")
+	public Result list(@CurrentUser CurrentUserWraper currentUser,@RequestParam Map<String, Object> params){
+		//查询列表数据,params中可以包含查询条件
+        if (params.containsKey("accountId")) {
+            params.remove("accountId");
+        }
+        params.put("accountId", currentUser.getId());
+        Query query = new Query(params);
+        return getResult(params, query);
+    }
+	
+	
+	/**
+	 * 查询用户自己的资源信息
+	 */
+	@GetMapping("/me/{${pk.attrname}}")
+    @PreAuthorize("hasAuthority('my_${tableName}')")
+    public Result info(@CurrentUser CurrentUserWraper currentUser, @PathVariable("${pk.attrname}") ${pk.attrType} ${pk.attrname}){
+        ${className}Entity ${classname} = ${classname}Service.queryObject(${pk.attrname});
+		if (currentUser.getId() != ${classname}.getAccountId()){
+            throw new AccessDeniedException("无权访问");
+        }
+		return new Result("${classname}", ${classname});
+	}
+	
+	/**
+	 * 用户保存资源
+	 */
+	@PostMapping("/me")
+    @PreAuthorize("hasAuthority('save_my_${tableName}')")
+    public Result save(@CurrentUser CurrentUserWraper currentUser, @RequestBody ${className}Entity ${classname}){
+		${classname}.setAccountId(currentUser.getId());
+        ${classname}Service.save(${classname});
+		
+		return ResultUtil.success();
+	}
+	
+	/**
+	 * 用户更新自己的资源
+	 */
+	@PutMapping("/me")
+    @PreAuthorize("hasAuthority('update_my_${tableName}')")
+	public Result update(@CurrentUser CurrentUserWraper currentUser, @RequestBody ${className}Entity ${classname}){
+        if (currentUser.getId() != ${classname}.getAccountId()){
+            throw new AccessDeniedException("无权访问");
+        }
+        ${classname}Service.update(${classname});
+		return ResultUtil.success();
+	}
+	
+	/**
+	 * 用户删除自己的资源
+	 */
+	@DeleteMapping("/me")
+    @PreAuthorize("hasAuthority('delete_my_${tableName}')")
+	public Result delete(@CurrentUser CurrentUserWraper currentUser, @RequestBody ${pk.attrType}[] ${pk.attrname}s){
+        Integer deleteOk = ${classname}Service.deleteOfMineLogically(currentUser.getId(), ${pk.attrname}s);
+		return ResultUtil.success(deleteOk);
+	}
+
+    /**
+      * 是否获取分页,没有page和limit参数则直接获取所有列表
+      * 使用方法   /资源名称?page=1&limit=10&param1=?&sidx=[asc||desc]&order=xx
+      * param1指查询参数,sidx指升序或降序,order排序字段
+      * @param params
+      * @param query
+      * @return
+      */
+    private Result getResult(@RequestParam Map<String, Object> params, Query query) {
+        if (params.get("page") != null && params.get("limit") != null) {
+            List<${className}Entity> ${classname}List = ${classname}Service.queryList(query);
+            int total = ${classname}Service.queryTotal(query);
+            PageUtils pageUtil = new PageUtils(${classname}List, total, query.getSize(), query.getPage());
+            return new Result(pageUtil);
+        } else {
+            List<${className}Entity> ${classname}List = ${classname}Service.queryList(query);
+            return new Result("list", ${classname}List);
+        }
+    }
+}
